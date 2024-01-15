@@ -17,10 +17,8 @@ const hyphenateRange = (arr) => {
     if (arr[i] === end + 1) {
       end = arr[i];
     } else {
-      ranges.push(start === end ? start :
-        `${start}${end - start > 1 ? '-' : ','}${end}`);
-      start = arr[i];
-      end = arr[i];
+      ranges.push(start === end ? start : `${start}-${end}`);
+      start = end = arr[i];
     }
   }
   ranges.push(start === end ? start : `${start}-${end}`);
@@ -30,9 +28,9 @@ const requireHyphenate = document.getElementById('requireHyphenate');
 const updateOutputShow = () => {
   const format = requireHyphenate.checked ? hyphenateRange : arr => arr.join(',');
   colorOutput.textContent =
-    format(colorOutput.dataset.pages.split(',').map(parseInt));
+    format(colorOutput.dataset.pages.split(',').map(x=>parseInt(x)));
   monoOutput.textContent =
-    format(monoOutput.dataset.pages.split(',').map(parseInt));
+    format(monoOutput.dataset.pages.split(',').map(x=>parseInt(x)));
 }
 requireHyphenate.addEventListener('change', updateOutputShow);
 
