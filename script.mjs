@@ -9,7 +9,8 @@ const printError = err => {
   errorOutput.textContent = err;
 }
 
-const hyphenateRange = (arr) => {
+const hyphenateRange = (arrSrc) => {
+  const arr = arrSrc.map(x=>parseInt(x)).filter(x=>!isNaN(x)).sort((a,b)=>a-b);
   const ranges = [];
   let start = arr[0];
   let end = arr[0];
@@ -27,10 +28,8 @@ const hyphenateRange = (arr) => {
 const requireHyphenate = document.getElementById('requireHyphenate');
 const updateOutputShow = () => {
   const format = requireHyphenate.checked ? hyphenateRange : arr => arr.join(',');
-  colorOutput.textContent =
-    format(colorOutput.dataset.pages.split(',').map(x=>parseInt(x)));
-  monoOutput.textContent =
-    format(monoOutput.dataset.pages.split(',').map(x=>parseInt(x)));
+  colorOutput.textContent = format(colorOutput.dataset.pages.split(','));
+  monoOutput.textContent = format(monoOutput.dataset.pages.split(','));
 }
 requireHyphenate.addEventListener('change', updateOutputShow);
 
