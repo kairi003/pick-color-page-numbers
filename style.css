@@ -1,0 +1,43 @@
+html,
+body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  max-width: 800px;
+  margin: auto;
+  padding: 1em;
+}
+
+progress:not([max]) {
+  display: none;
+}
+
+progress[max] {
+  width: 100%;
+  max-width: 500px;
+}
+
+pre {
+  white-space: pre-wrap;
+  word-break: break-all;
+  border: 1px solid black;
+  min-height: 1.2em;
+  line-height: 1.2em;
+  padding: 0.5em;
+}
+
+#errorOutput {
+  color: red;
+  border: none;
+}
+
+#errorOutput:empty {
+  display: none;
+}
+
+#errorOutput::before {
+  content: 'Error: ';
+}

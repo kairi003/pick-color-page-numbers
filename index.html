@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="UTF-8">
+  <title>Pick Color Page Numbers</title>
+  <link rel="stylesheet" href="./style.css">
+</head>
+
+<body>
+
+  <h1>Pick Color Page Numbers</h1>
+
+  <h2>Input PDF File:</h2>
+  <div>
+    <input type="file" id="fileInput" accept="application/pdf" />
+  </div>
+  <div>
+    <label><input type="checkbox" id="requireHyphenate" checked>Hyphenate Ranges</label>
+  </div>
+
+  <div>
+    <progress id="progress"></progress>
+    <span id="progressText"></span>
+  </div>
+
+  <h2>Color Page Numbers:</h2>
+  <pre id="colorOutput"></pre>
+  <h2>Monochrome Page Numbers:</h2>
+  <pre id="monoOutput"></pre>
+  <pre id="errorOutput"></pre>
+
+  <script src="./pdfjs-dist/build/pdf.min.mjs" type="module"></script>
+
+  <script src="./script.mjs" type="module"></script>
+</body>
+
+</html>
