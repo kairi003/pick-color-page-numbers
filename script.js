@@ -31,12 +31,12 @@ const hyphenateRange = (arrSrc) => {
   ranges.push(start === end ? start : `${start}-${end}`);
   return ranges.join(',');
 };
-const updateOutputShow = () => {
+const updateDisplay = () => {
   const format = requireHyphenate.checked ? hyphenateRange : arr => arr.join(',');
   colorOutput.textContent = format(colorOutput.dataset.pages.split(','));
   monoOutput.textContent = format(monoOutput.dataset.pages.split(','));
 }
-requireHyphenate.addEventListener('change', updateOutputShow);
+requireHyphenate.addEventListener('change', updateDisplay);
 
 
 let worker = null;
@@ -64,7 +64,7 @@ const messageHandle = (event) => {
       monoOutput.dataset.pages = isMonoArray
         .map((isMono, index) => isMono ? index + 1 : '')
         .filter(Boolean).join(',');
-      updateOutputShow();
+      updateDisplay();
       break;
     case MESSAGE_TYPE.ERROR:
       errorOutput.textContent = data;
