@@ -2,6 +2,7 @@
 import * as pdfjsLib from './pdfjs-dist/build/pdf.min.mjs';
 
 const MESSAGE_TYPE = {
+  READY: 'ready',
   LOAD: 'load',
   PROGRESS: 'progress',
   DONE: 'done',
@@ -60,3 +61,5 @@ self.onmessage = async (event) => {
     self.postMessage({id, type: MESSAGE_TYPE.ERROR, data: e});
   }
 };
+
+self.postMessage({type: MESSAGE_TYPE.READY});

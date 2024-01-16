@@ -1,5 +1,6 @@
 
 const MESSAGE_TYPE = {
+  READY: 'ready',
   LOAD: 'load',
   PROGRESS: 'progress',
   DONE: 'done',
@@ -42,8 +43,8 @@ let worker = null;
 let taskId = 0;
 
 const messageHandle = (event) => {
-  console.log('Receive:', event);
   const { id, type, data } = event.data;
+  console.log('Receive:', {id, type, data});
   if (id !== taskId) return;
   switch (type) {
     case MESSAGE_TYPE.LOAD:
@@ -77,12 +78,13 @@ fileInput.addEventListener('change', async event => {
   if (!file) return;
   const arrayBuffer = await file.arrayBuffer();
   worker?.terminate();
-  worker = new Worker('./script.worker.mjs', {
-    type: 'module'
-  });
-  worker.addEventListener('message', messageHandle);
-  worker.postMessage({
-    id: ++taskId,
-    data: arrayBuffer
-  });
+  worker = new Worker('./worker.mjs', { type: 'module' });
+  worker.addEventListener('message', (event) => {
+    console.log('worker ready');
+    worker.addEventListener('message', messageHandle);
+    worker.postMessage({
+      id: ++taskId,
+      data: arrayBuffer
+    });
+  }, { once: true });
 });
