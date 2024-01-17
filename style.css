@@ -11,13 +11,13 @@ body {
   padding: 1em;
 }
 
-progress:not([max]) {
-  display: none;
+progress {
+  width: calc(100% - 5em);
+  max-width: 500px;
 }
 
-progress[max] {
-  width: 100%;
-  max-width: 500px;
+progress:not([max]) {
+  display: none;
 }
 
 pre {
@@ -34,10 +34,10 @@ pre {
   border: none;
 }
 
-#errorOutput:empty {
-  display: none;
-}
-
 #errorOutput::before {
   content: 'Error: ';
+}
+
+#errorOutput:empty {
+  display: none;
 }
