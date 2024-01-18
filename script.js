@@ -1,4 +1,3 @@
-
 const MESSAGE_TYPE = {
   READY: 'ready',
   LOAD: 'load',
@@ -39,52 +38,57 @@ const updateDisplay = () => {
 requireHyphenate.addEventListener('change', updateDisplay);
 
 
-let worker = null;
-let taskId = 0;
-
-const messageHandle = (event) => {
-  const { id, type, data } = event.data;
-  console.log('Receive:', {id, type, data});
-  if (id !== taskId) return;
-  switch (type) {
-    case MESSAGE_TYPE.LOAD:
-      progress.max = +data;
-      progress.value = 0;
-      progressText.textContent = `${progress.value} / ${progress.max}`;
-      break;
-    case MESSAGE_TYPE.PROGRESS:
-      progress.value++;
-      progressText.textContent = `${progress.value} / ${progress.max}`;
-      break;
-    case MESSAGE_TYPE.DONE:
-      const isMonoArray = data;
-      colorOutput.dataset.pages = isMonoArray
-        .map((isMono, index) => isMono ? '' : index + 1)
-        .filter(Boolean).join(',');
-      monoOutput.dataset.pages = isMonoArray
-        .map((isMono, index) => isMono ? index + 1 : '')
-        .filter(Boolean).join(',');
-      updateDisplay();
-      break;
-    case MESSAGE_TYPE.ERROR:
-      errorOutput.textContent = data;
-      break;
-  }
+const getMessageHandler = () => {
+  let readyResolve;
+  const readyPromise = new Promise(resolve => readyResolve = resolve);
+  const handler = (event) => {
+    const { type, data } = event.data;
+    console.log('Receive:', { type, data });
+    switch (type) {
+      case MESSAGE_TYPE.READY:
+        readyResolve();
+        break;
+      case MESSAGE_TYPE.LOAD:
+        progress.max = +data;
+        progress.value = 0;
+        progressText.textContent = `${progress.value} / ${progress.max}`;
+        break;
+      case MESSAGE_TYPE.PROGRESS:
+        progress.value++;
+        progressText.textContent = `${progress.value} / ${progress.max}`;
+        break;
+      case MESSAGE_TYPE.DONE:
+        const isMonoArray = data;
+        colorOutput.dataset.pages = isMonoArray
+          .map((isMono, index) => isMono ? '' : index + 1)
+          .filter(Boolean).join(',');
+        monoOutput.dataset.pages = isMonoArray
+          .map((isMono, index) => isMono ? index + 1 : '')
+          .filter(Boolean).join(',');
+        updateDisplay();
+        break;
+      case MESSAGE_TYPE.ERROR:
+        errorOutput.textContent = data;
+        break;
+    }
+  };
+  return { readyPromise, handler };
 };
 
 fileInput.addEventListener('change', async event => {
   console.log(event);
   const file = fileInput.files[0];
   if (!file) return;
-  const arrayBuffer = await file.arrayBuffer();
-  worker?.terminate();
-  worker = new Worker('./worker.mjs', { type: 'module' });
-  worker.addEventListener('message', (event) => {
-    console.log('worker ready');
-    worker.addEventListener('message', messageHandle);
-    worker.postMessage({
-      id: ++taskId,
-      data: arrayBuffer
-    });
-  }, { once: true });
+  const arrayBufferPromise = file.arrayBuffer();
+
+  const {signal, abort} = new AbortController();
+  fileInput.addEventListener('change', abort, { once: true });
+
+  const { readyPromise, handler } = getMessageHandler();
+  const worker = new Worker('./worker.mjs', { type: 'module' });
+  worker.addEventListener('message', handler, { signal });
+  signal.addEventListener('abort', worker.terminate, { once: true });
+
+  await readyPromise;
+  worker.postMessage({ data: await arrayBufferPromise });
 });
